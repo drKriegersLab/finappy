@@ -1,6 +1,12 @@
 from TransactionManagger import AccountTypes, TransactionManagger
 from AccountPrimitives import Account
 
+"""
+NOTE for my code:
+I used to create a class' main variables before the initialization, because the code will be clearer with this way.
+But I cannot declare its types and values, therefore they are not static members of the class
+"""
+
 class JokerHMI:
   accounts = []
   TM = None
@@ -9,7 +15,7 @@ class JokerHMI:
     for dict_element in acc_init_dict:
       acc = Account(dict_element,acc_init_dict[dict_element] )
       self.accounts.append(acc)
-
+      acc = None
     self.TM = TransactionManagger(self.accounts)
     return
 

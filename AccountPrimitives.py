@@ -1,6 +1,8 @@
 from datetime import datetime
 from enum import Enum
 
+
+
 ## ENUMS
 class TransactionTypes(Enum):
   incoming= 0
@@ -37,13 +39,13 @@ class Modification:
 
 
 class Account:
-  name = ''
+  name = None
   ''' name of the account; :type: string'''
-  note = ''
+  note = None
   ''' some important information about the account; :type: string'''
-  modification_list = []
+  modification_list = None
   ''' store of all modification that is associated to this account; :type: list of Modification objects'''
-  balance = 0.0
+  balance = None
   ''' balance of this account inf HUF; :type: float'''
 
   def __init__(self, acc_name, note):
@@ -51,13 +53,15 @@ class Account:
     first_mod = Modification()
     first_mod.change = 0.0
     first_mod.reason = 'init'
-    first_mod.time_stamp = None
+    first_mod.time_stamp = datetime.now()
     first_mod.modification_type = TransactionTypes.init
     first_mod.note = note
 
     # init the account
     self.name = acc_name
     self.note = note
+    self.modification_list = []
+    self.balance = 0.0
     self.doModification(first_mod)
     return
 
