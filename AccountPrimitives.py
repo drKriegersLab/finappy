@@ -46,22 +46,45 @@ class Account:
   balance = 0.0
   ''' balance of this account inf HUF; :type: float'''
 
+  def __init__(self, acc_name, note):
+    # create the first modification
+    first_mod = Modification()
+    first_mod.change = 0.0
+    first_mod.reason = 'init'
+    first_mod.time_stamp = None
+    first_mod.modification_type = TransactionTypes.init
+    first_mod.note = note
+
+    # init the account
+    self.name = acc_name
+    self.note = note
+    self.doModification(first_mod)
+    return
+
   def doModification(self, mod):
     # check the field types
-
+    assert (type(mod.change) == float) or (type(mod.change) == int), "[%s account] The content of modification's name field is not float or int"%self.name
+    assert type(mod.reason) == str, "[%s account] The content of reason field in the modification is not string"%self.name
+    assert type(mod.time_stamp) == datetime, "[%s account] The value in the time_stamp field of the modification is not a datetime format"%self.name
+    assert type(mod.modification_type) == TransactionTypes, "[%s account] The value in the modification_type field of the modification is not in valid format"%self.name
+    assert type(mod.note) == str, "[%s account] The value in the note field is not a string"%self.name
     # append the modification
 
+    self.modification_list.append(mod)
     # update balance
+    self.balance += mod.change
     return
 
   def getBalance(self):
     return self.balance
 
   def getNthTransaction(self, id_of_transaction):
-    return
+    assert id_of_transaction >= len(self.modification_list)
+    return self.modification_list[id_of_transaction]
 
   def getLastTransaction(self):
-    return
+    return self.modification_list[len(self.modification_list) - 1]
+
 
 
 
