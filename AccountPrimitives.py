@@ -5,6 +5,9 @@ from enum import Enum
 
 ## ENUMS
 class TransactionTypes(Enum):
+  """
+  Enum like Class for store some specified classes of transactions for sorting.
+  """
   incoming= 0
   fees = 1
   food = 2
@@ -18,13 +21,19 @@ class TransactionTypes(Enum):
   init = 99
 
 class AccountTypes(Enum):
+  """
+  Enum like Class for storing which account types are specified in this program
+  """
   MAIN = 0
   CARD = 1
   CASH = 2
   init = 99
 
-## CLASSES
+## STRUCTS
 class Modification:
+  """
+  Structure like Class that is encapsulate the modifications
+  """
   change = 0.0
   ''' value of the changing :type: float'''
   reason = ''
@@ -37,11 +46,15 @@ class Modification:
   note = ''
   ''' some important information about the modification; :type: string'''
 
+## CLASSES
 
 class Account:
+  """
+  Primitive class of all accounts and its main managing methods
+  """
   name = None
   ''' name of the account; :type: string'''
-  note = None
+  __note = None
   ''' some important information about the account; :type: string'''
   modification_list = None
   ''' store of all modification that is associated to this account; :type: list of Modification objects'''
@@ -79,16 +92,18 @@ class Account:
     self.balance += mod.change
     return
 
-  def getBalance(self):
-    return self.balance
+  def createModification(self, _value, _reason, _time_stamp, _transaction_type, _note):
+    # create a mod object
+    mod = Modification()
+    mod.change = _value
+    mod.reason = _reason
+    mod.time_stamp = _time_stamp
+    mod.modification_type = _transaction_type
+    mod.note = _note
 
-  def getNthTransaction(self, id_of_transaction):
-    assert id_of_transaction >= len(self.modification_list)
-    return self.modification_list[id_of_transaction]
-
-  def getLastTransaction(self):
-    return self.modification_list[len(self.modification_list) - 1]
-
+    # execute the modification
+    self.doModification(mod)
+    return
 
 
 
