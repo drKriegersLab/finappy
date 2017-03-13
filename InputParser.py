@@ -21,7 +21,7 @@ class Fields_enum(Enum):
   currency = 3
   date_of_realisation = 4
   date2 = 5
-  num1 = 6
+  balance = 6
   field1 = 7
   field2 = 8
   note = 9
@@ -33,18 +33,21 @@ class Fields_enum(Enum):
 
 
 class CSV_Transaction:
-  fields = None
   card_number = None # the number of mentioned card
   sign = None # -1 or +1, which represents that this transaction is a deposit or a withdrawal
   change_value = None # the value of changing
   currency = None # represents the currency of the change (for example HUF)
   date_of_realization = None # when was the transaction
   date_of_transaction = None # when appeared the transaction on the account
+  balance = None # the new balance after the transaction
   note = None # the important notes for the transaction
   transaction_name = None # the type of the transaction
 
   def __init__(self, **kwargs):
 
+    #if Fields_enum.date_of_transaction.name in kwargs:
+    #  if "Kama" in kwargs[Fields_enum.date_of_transaction.name]:
+    #    print 'ez itt nem jo'
     #assert len(kwargs) == len(Fields_enum), "not enough input fields!"
     if Fields_enum.card_number.name in kwargs:
       self.parseCardNumber(kwargs[Fields_enum.card_number.name])
@@ -58,6 +61,8 @@ class CSV_Transaction:
       self.parseDateOfRealisation(kwargs[Fields_enum.date_of_realisation.name])
     if Fields_enum.date_of_transaction.name in kwargs:
       self.parseDateOfTransaction(kwargs[Fields_enum.date_of_transaction.name])
+    if Fields_enum.balance.name in kwargs:
+      self.parseNewBalance(kwargs[Fields_enum.balance.name])
     if Fields_enum.note.name in kwargs:
       self.parseNote(kwargs[Fields_enum.note.name])
     if Fields_enum.transaction.name in kwargs:
@@ -78,7 +83,7 @@ class CSV_Transaction:
     if sign == "T": #terheles
       self.sign = -1
     if sign == "J":
-      self.sign = -1
+      self.sign = 1
 
     return
 
@@ -99,7 +104,11 @@ class CSV_Transaction:
   def parseDateOfTransaction(self, dateString):
     # Some reason the UNIVERSITAS'es deposit is different from other transactions :-)
     # thus if this is detected the DateOfTransaction will be equal to DateOfRealisation
-    if (dateString[1:4] == "UNI") or (dateString == ''):
+    # other exceptions:
+    #   - empty field
+    #   - hungarian student's loan organization's different fields
+    #   - bank dependent "Kamatado" transaction
+    if (dateString[1:4] == "UNI") or (dateString == '') or ("hitel" in dateString) or ('Kama' in dateString):
       self.date_of_transaction = self.date_of_realization
     else:
       self.date_of_transaction = datetime.date(year=int(dateString[1:5]),
@@ -107,8 +116,15 @@ class CSV_Transaction:
                                                day=int(dateString[9:11]))
     return
 
+  def parseNewBalance(self, balanceString):
+    self.balance = float(balanceString)
+
   def parseNote(self, string):
-    self.note = string
+    # if exception occurred by hungarian student loan's transaction
+    if '967' in string:
+      self.note = 'DH'
+    else:
+      self.note = string
     return
 
   def parseTransactionName(self, string):
@@ -119,7 +135,7 @@ class CSV_Transaction:
 
 
 
-def parseOTPcsv(fileName):
+def parseOTPcsv(fileName, csv_transactions=[]):
   fileObj = open(fileName)
 
   csvObj = csv.reader(fileObj)
@@ -127,7 +143,7 @@ def parseOTPcsv(fileName):
   csvLines = []
   field = []
   fields = {}
-  csv_transactions = []
+  #csv_transactions = []
   for row in csvObj:
     fieldNum = 0
     fields = {}
@@ -150,10 +166,10 @@ def parseOTPcsv(fileName):
 
 ###################################################
 ###################################################
-
-filename = 'bank_cvs.csv'
-parseOTPcsv(filename)
-print 'muhaha'
+if __name__ == '__main__':
+  filename = 'bank_cvs.csv'
+  parseOTPcsv(filename)
+  print 'muhaha'
 
 
 
