@@ -1,10 +1,17 @@
 import csv
 from aenum import Enum
-import datetime
+from datetime import datetime
+from Input_Parser_Primitives import Fields_enum, InputParserPrimitive, InputInterfacePrimitive
+
+
+## It contains only derived classes of primitives of IO_parsers file
+
 '''
 This module is for parsing the csv files that are imported from OTP bank's internal web interface. The parseOTPcsv function
 manages the parsing methods. It opens the csv file and gets all interpretable fields and create a list of CSV_Transaction
 objects from it
+
+
 
 ## NOTE: if you want to include or remove a field, you only just follow the next steps:
 ##    1. modify the Fields_enum enum
@@ -13,42 +20,45 @@ objects from it
 ##    4. include or remove the correct lines in the init method of the CSV_Transaction class
 '''
 
+## DERIVED CLASS OF IO_Parser_Primitive  FOR OTP SPECIFIC PARSING
+class InputInterfaceOTP(InputInterfacePrimitive):
+  def __init__(self):
+    self.InputParser = InputParserOTP
 
-class Fields_enum(Enum):
-  card_number = 0
-  sign = 1
-  change = 2
-  currency = 3
-  date_of_realisation = 4
-  date2 = 5
-  balance = 6
-  field1 = 7
-  field2 = 8
-  note = 9
-  field3 = 10
-  date_of_transaction = 11
-  transaction = 12
-  field4 = 13
+  def inputParserFcn(self, fileName, transaction_list=[]):
+    fileObj = open(fileName)
+
+    csvObj = csv.reader(fileObj)
+
+    csvLines = []
+    field = []
+    fields = {}
+    # csv_transactions = []
+    for row in csvObj:
+      fieldNum = 0
+      fields = {}
+      field = []
+      for character in row[0]:  # the 0-th element of the row is the container of string array
+        # fill each fields. The separator between they is semicolon
+        if not character == ';':
+          field.append(character)
+        else:
+          fields[Fields_enum(fieldNum).name] = ''.join(field)
+          fieldNum += 1
+          field = []
+
+      tr = self.InputParser(**fields)
+      transaction_list.append(tr)
+
+    return transaction_list
 
 
-
-class CSV_Transaction:
-  card_number = None # the number of mentioned card
-  sign = None # -1 or +1, which represents that this transaction is a deposit or a withdrawal
-  change_value = None # the value of changing
-  currency = None # represents the currency of the change (for example HUF)
-  date_of_realization = None # when was the transaction
-  date_of_transaction = None # when appeared the transaction on the account
-  balance = None # the new balance after the transaction
-  note = None # the important notes for the transaction
-  transaction_name = None # the type of the transaction
+## DERIVED CLASS OF INPUT PARSER
+class InputParserOTP(InputParserPrimitive):
 
   def __init__(self, **kwargs):
+    InputParserPrimitive.__init__(self, **kwargs)
 
-    #if Fields_enum.date_of_transaction.name in kwargs:
-    #  if "Kama" in kwargs[Fields_enum.date_of_transaction.name]:
-    #    print 'ez itt nem jo'
-    #assert len(kwargs) == len(Fields_enum), "not enough input fields!"
     if Fields_enum.card_number.name in kwargs:
       self.parseCardNumber(kwargs[Fields_enum.card_number.name])
     if Fields_enum.sign.name in kwargs:
@@ -68,14 +78,9 @@ class CSV_Transaction:
     if Fields_enum.transaction.name in kwargs:
       self.parseTransactionName(kwargs[Fields_enum.transaction.name])
 
-    #for key, item in kwargs.iteritems():
-      #print '%s : %s'%(key, item)
-
     return
 
   def parseCardNumber(self, card_num):
-
-
     self.card_number = int(card_num)
     return
 
@@ -96,13 +101,13 @@ class CSV_Transaction:
     return
 
   def parseDateOfRealisation(self, dateString):
-    self.date_of_realization = datetime.date(year=int(dateString[0:4]),
+    self.date_of_realization = datetime(year=int(dateString[0:4]),
                                              month=int(dateString[4:6]),
                                              day=int(dateString[6:8]))
     return
 
   def parseDateOfTransaction(self, dateString):
-    # Some reason the UNIVERSITAS'es deposit is different from other transactions :-)
+    # Some reason the UNIVERSITAS's deposit is different from other transactions :-)
     # thus if this is detected the DateOfTransaction will be equal to DateOfRealisation
     # other exceptions:
     #   - empty field
@@ -111,7 +116,7 @@ class CSV_Transaction:
     if (dateString[1:4] == "UNI") or (dateString == '') or ("hitel" in dateString) or ('Kama' in dateString):
       self.date_of_transaction = self.date_of_realization
     else:
-      self.date_of_transaction = datetime.date(year=int(dateString[1:5]),
+      self.date_of_transaction = datetime(year=int(dateString[1:5]),
                                                month=int(dateString[6:8]),
                                                day=int(dateString[9:11]))
     return
@@ -132,35 +137,6 @@ class CSV_Transaction:
     return
 
 
-
-
-
-def parseOTPcsv(fileName, csv_transactions=[]):
-  fileObj = open(fileName)
-
-  csvObj = csv.reader(fileObj)
-
-  csvLines = []
-  field = []
-  fields = {}
-  #csv_transactions = []
-  for row in csvObj:
-    fieldNum = 0
-    fields = {}
-    field = []
-    for character in row[0]: # the 0-th element of the row is the container of string array
-      # fill each fields. The separator between they is semicolon
-      if not character == ';':
-        field.append(character)
-      else:
-        fields[Fields_enum(fieldNum).name] = ''.join(field)
-        fieldNum += 1
-        field = []
-
-    tr = CSV_Transaction(**fields)
-    csv_transactions.append(tr)
-
-  return csv_transactions
 
 
 

@@ -1,5 +1,6 @@
 from TransactionManagger import AccountTypes, TransactionManagger
-from AccountPrimitives import Account
+from AccountPrimitives import Account, TransactionTypes
+from InputParser_OTPcsvReader import InputInterfaceOTP
 
 """
 NOTE for my code:
@@ -10,8 +11,9 @@ But I cannot declare its types and values, therefore they are not static members
 class JokerHMI:
   '''
   Class for interfacing to the core functions, which are:
-    - (TM) Transaction Managger
-    - .... in future: (IO_parser) DataParser
+    - (TM) Transaction Manager
+    - (InputInterface) Interface for different input files that will parse data from databases
+    - .... in future: (IO_DataManager) Interface for load or save database and calculated data.
     - .... in future: (Calc) Evaluation module for calculation trends and future expectations
     - .... in future: (Graph) Visualise the results of Calc module and the current balances
     - .... in future: (WM) Window Manager for creating fancy windowed application from this stuff
@@ -19,19 +21,23 @@ class JokerHMI:
   accounts = []
   """ list of managed accounts"""
   ## Modules
-  TM = None # Transaction Managger
-  IO_Parser = None # Handle import and export tasks
+  TM = None # Transaction Manager
+  InputInterface = None # Handler of import tasks
   Calc = None # Evaluation module
   Graph = None # Plot generator module
   WM = None # Window Manager
 
 
   def __init__(self, account_init_dict):
+    # create accounts
     for dict_element in account_init_dict:
       acc = Account(dict_element,account_init_dict[dict_element])
       self.accounts.append(acc)
       acc = None
+
+    # assign the case-specific classes
     self.TM = TransactionManagger(self.accounts)
+    self.InputInterface = InputInterfaceOTP()
     return
 
   def reqTransaction(self, account_name, change_value, reason_note, trans_type, time, other_note):
@@ -43,4 +49,20 @@ class JokerHMI:
                           note=other_note)
     return
 
+  def loadTransactionsFromCsv(self, csv_filenames):
+    csv_tr_list = []
+    # parsing of input file
+    for file_name in csv_filenames:
+      self.InputInterface.inputParserFcn(file_name, transaction_list=csv_tr_list)
+
+    for tr_num in range(len(csv_tr_list)):
+      tr_record = csv_tr_list[tr_num]
+      self.reqTransaction(account_name=AccountTypes.CARD.name,
+                          change_value=tr_record.change_value,
+                          reason_note=tr_record.note,
+                          trans_type=TransactionTypes.other,
+                          time=tr_record.date_of_transaction,
+                          other_note='')
+
+    return
 
