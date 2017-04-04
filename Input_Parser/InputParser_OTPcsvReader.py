@@ -1,8 +1,7 @@
 import csv
-from aenum import Enum
 from datetime import datetime
-from Input_Parser_Primitives import Fields_enum, InputParserPrimitive, InputInterfacePrimitive
 
+from Input_Parser.Input_Parser_Primitives import Fields_enum, InputParserPrimitive, InputInterfacePrimitive
 
 ## It contains only derived classes of primitives of IO_parsers file
 

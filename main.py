@@ -1,5 +1,5 @@
-from JokerTheHMI import JokerHMI
-from TransactionManagger import AccountTypes, TransactionManagger, TransactionTypes
+from HMI.JokerTheHMI import JokerHMI
+from TransactionManagers.TransactionManagger import AccountTypes
 
 '''
 acc_init_dict = {}
@@ -13,7 +13,7 @@ HMI.reqTransaction(AccountTypes.CARD.name, +5000, 'deposit 5000 HUF', Transactio
 HMI.reqTransaction(AccountTypes.CARD.name, 3000, 'get 3000 HUF from the card', TransactionTypes.withdrawal, datetime.now(), 'note for withdrawal')
 '''
 
-filenames = ['2016_12.csv','2017_01.csv','2017_02.csv','2017_03.csv']
+filenames = ['BankAccountSources/2016_12.csv','BankAccountSources/2017_01.csv','BankAccountSources/2017_02.csv','BankAccountSources/2017_03.csv']
 '''
 csv_tr_list = []
 

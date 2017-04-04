@@ -1,6 +1,6 @@
-from TransactionManagger import AccountTypes, TransactionManagger
-from AccountPrimitives import Account, TransactionTypes
-from InputParser_OTPcsvReader import InputInterfaceOTP
+from Input_Parser.InputParser_OTPcsvReader import InputInterfaceOTP
+from TransactionManagers.AccountPrimitives import Account, TransactionTypes
+from TransactionManagers.TransactionManagger import AccountTypes, TransactionManagger
 
 """
 NOTE for my code:

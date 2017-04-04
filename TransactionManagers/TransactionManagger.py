@@ -1,4 +1,4 @@
-from AccountPrimitives import TransactionTypes, AccountTypes
+from TransactionManagers.AccountPrimitives import TransactionTypes, AccountTypes
 
 class TransactionManagger():
   ## vars
