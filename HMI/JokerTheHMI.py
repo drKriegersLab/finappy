@@ -1,6 +1,7 @@
 from Input_Parser.InputParser_OTPcsvReader import InputInterfaceOTP
 from TransactionManagers.AccountPrimitives import Account, TransactionTypes
 from TransactionManagers.TransactionManagger import AccountTypes, TransactionManagger
+from Calc_modules.Calc import Calc as CalcModule
 
 """
 NOTE for my code:
@@ -18,8 +19,8 @@ class JokerHMI:
     - .... in future: (Graph) Visualise the results of Calc module and the current balances
     - .... in future: (WM) Window Manager for creating fancy windowed application from this stuff
   '''
-  accounts = []
-  """ list of managed accounts"""
+  accounts = [] ## list of managed accounts
+
   ## Modules
   TM = None # Transaction Manager
   InputInterface = None # Handler of import tasks
@@ -33,11 +34,11 @@ class JokerHMI:
     for dict_element in account_init_dict:
       acc = Account(dict_element,account_init_dict[dict_element])
       self.accounts.append(acc)
-      acc = None
 
     # assign the case-specific classes
     self.TM = TransactionManagger(self.accounts)
     self.InputInterface = InputInterfaceOTP()
+    self.Calc = CalcModule(self.TM)
     return
 
   def reqTransaction(self, account_name, change_value, reason_note, trans_type, time, other_note):

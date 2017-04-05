@@ -1,5 +1,6 @@
 from HMI.JokerTheHMI import JokerHMI
 from TransactionManagers.TransactionManagger import AccountTypes
+from datetime import datetime
 
 '''
 acc_init_dict = {}
@@ -29,6 +30,7 @@ HMI = JokerHMI(acc_init_dict)
 #HMI.reqTransaction(AccountTypes.CASH.name, +10000, 'test', TransactionTypes.culture,datetime.now(), 'init other note')
 HMI.loadTransactionsFromCsv(filenames)
 
+trs = HMI.Calc.selTrsInInterval(AccountTypes.CARD.name, datetime(2017,03,9), datetime(2017,03,12))
 
 print "muhaha"
 
