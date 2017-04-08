@@ -35,16 +35,23 @@ class Modification:
   Structure like Class that is encapsulate the modifications
   """
   change = 0.0
-  ''' value of the changing :type: float'''
+  ''' value of the changing
+  :type: float'''
+  new_balance = 0.0
+  ''' the new value of account
+  :type: float'''
   reason = ''
-  ''' reason of the modification; :type: string'''
+  ''' reason of the modification
+  :type: string'''
   time_stamp = None
-  ''' time point of modification; :type: datetime.datetime'''
+  ''' time point of modification
+  :type: datetime.datetime'''
   modification_type = None
   ''' class of modification. This field sorts the transaction into a larger group of modifications. For example this money was spend for food, clothes etc.
   :type: TransactionTypes enum'''
   note = ''
-  ''' some important information about the modification; :type: string'''
+  ''' some important information about the modification
+  :type: string'''
 
 ## CLASSES
 
@@ -61,18 +68,18 @@ class Account:
   balance = None
   ''' balance of this account inf HUF; :type: float'''
 
-  def __init__(self, acc_name, note):
+  def __init__(self, acc_name, init_value):
     # create the first modification
     first_mod = Modification()
-    first_mod.change = 0.0
+    first_mod.change = float(init_value)
     first_mod.reason = 'init'
     first_mod.time_stamp = datetime.now()
     first_mod.modification_type = TransactionTypes.init
-    first_mod.note = note
+    first_mod.note = acc_name + " account"
 
     # init the account
     self.name = acc_name
-    self.note = note
+    self.note = acc_name + " account"
     self.modification_list = []
     self.balance = 0.0
     self.doModification(first_mod)
@@ -85,11 +92,11 @@ class Account:
     assert type(mod.time_stamp) == datetime, "[%s account] The value in the time_stamp field of the modification is not a datetime format"%self.name
     assert type(mod.modification_type) == TransactionTypes, "[%s account] The value in the modification_type field of the modification is not in valid format"%self.name
     assert type(mod.note) == str, "[%s account] The value in the note field is not a string"%self.name
-    # append the modification
-
-    self.modification_list.append(mod)
     # update balance
     self.balance += mod.change
+    mod.new_balance = self.balance
+    # append the modification
+    self.modification_list.append(mod)
     return
 
   def createModification(self, _value, _reason, _time_stamp, _transaction_type, _note):
