@@ -29,10 +29,10 @@ class JokerHMI:
   WM = None # Window Manager
 
 
-  def __init__(self, account_init_dict):
+  def __init__(self, account_init_values):
     # create accounts
-    for dict_element in account_init_dict:
-      acc = Account(dict_element,account_init_dict[dict_element])
+    for dict_element in account_init_values:
+      acc = Account(dict_element, account_init_values[dict_element])
       self.accounts.append(acc)
 
     # assign the case-specific classes

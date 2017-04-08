@@ -22,15 +22,15 @@ for file_name in filenames:
     parseOTPcsv(file_name, csv_transactions=csv_tr_list)
 
 '''
-acc_init_dict = {}
-acc_init_dict[AccountTypes.CASH.name] = " CASH account"
-acc_init_dict[AccountTypes.CARD.name] = " CARD account"
+acc_init_values = {AccountTypes.CASH.name: 0,
+                   AccountTypes.CARD.name: 403527}
 
-HMI = JokerHMI(acc_init_dict)
+HMI = JokerHMI(acc_init_values)
 #HMI.reqTransaction(AccountTypes.CASH.name, +10000, 'test', TransactionTypes.culture,datetime.now(), 'init other note')
 HMI.loadTransactionsFromCsv(filenames)
 
 trs = HMI.Calc.selTrsInInterval(AccountTypes.CARD.name, datetime(2017,03,9), datetime(2017,03,12))
+bals = HMI.Calc.getChangesOfTrs(trs)
 
 print "muhaha"
 
