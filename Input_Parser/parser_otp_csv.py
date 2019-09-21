@@ -6,11 +6,8 @@ from Input_Parser.parser_bases import Fields_enum, ParseTransaction, ParserBase
 ## It contains only derived classes of primitives of IO_parsers file
 
 '''
-This module is for parsing the csv files that are imported from OTP bank's internal web interface. The parseOTPcsv function
-manages the parsing methods. It opens the csv file and gets all interpretable fields and create a list of CSV_Transaction
-objects from it
-
-
+This module is for parsing the csv files that are exported from OTP bank's internal web interface. The OtpCsvParser
+do the file level operations and the ParseOtpTransaction class eval the fetched lines of the csv file
 
 ## NOTE: if you want to include or remove a field, you only just follow the next steps:
 ##    1. modify the Fields_enum enum
@@ -20,9 +17,9 @@ objects from it
 '''
 
 
-class OtoCsvParser(ParserBase):
+class OtpCsvParser(ParserBase):
 	def __init__(self, file_name=None):
-		ParserBase.__init__(self, ParseOTPTransaction)
+		ParserBase.__init__(self, ParseOtpTransaction)
 		
 		if file_name is not None:
 			self.parse_input_file(file_name)
@@ -33,11 +30,11 @@ class OtoCsvParser(ParserBase):
 		with open(file_name, 'r', encoding='utf-8') as file_obj:
 			for line in file_obj:
 				line_pieces = line.split(';')
-				parsed_transaction = ParseOTPTransaction(line_pieces)
+				parsed_transaction = ParseOtpTransaction(line_pieces)
 				self.transaction_list.append(parsed_transaction)
 
 
-class ParseOTPTransaction(ParseTransaction):
+class ParseOtpTransaction(ParseTransaction):
 	
 	def __init__(self, csv_line_pieces):
 		ParseTransaction.__init__(self)
@@ -72,9 +69,7 @@ class ParseOTPTransaction(ParseTransaction):
 		return
 	
 	def parse_date_of_realisation(self, dateString):
-		self.date_of_realization = datetime(year=int(dateString[0:4]),
-		                                    month=int(dateString[4:6]),
-		                                    day=int(dateString[6:8]))
+		self.date_of_realization = datetime(year=int(dateString[0:4]), month=int(dateString[4:6]), day=int(dateString[6:8]))
 		return
 	
 	def parse_date_of_transaction(self, dateString):
@@ -112,6 +107,6 @@ class ParseOTPTransaction(ParseTransaction):
 ###################################################
 if __name__ == '__main__':
 	filename = r'c:\__DATA__\otp_account_history_2019_aug.csv'
-	file_parser = OtoCsvParser(filename)
+	file_parser = OtpCsvParser(filename)
 	
 	print('muhaha')
