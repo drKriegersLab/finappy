@@ -1,25 +1,10 @@
 from datetime import datetime
 from enum import Enum
+from TransactionManagers.transaction import Transaction, TransactionTypes
 
-# ENUMS
-
-
-class TransactionTypes(Enum):
-	"""
-	Enum like Class for store some specified classes of transactions for sorting.
-	"""
-	incoming = 0
-	fees = 1
-	food = 2
-	clothes = 3
-	IT = 4
-	withdrawal = 5
-	deposit = 6
-	culture = 7
-	entertainment = 8
-	other = 9
-	init = 99
-
+msg_color_warning = '\x1b[1;33;0m'
+msg_color_ok = '\x1b[1;30;0m'
+msg_color_end = '\x1b[0m'
 
 class AccountTypes(Enum):
 	"""
@@ -31,90 +16,106 @@ class AccountTypes(Enum):
 	init = 99
 
 
-## STRUCTS
-class Modification:
-	"""
-	Structure like Class that is encapsulate the modifications
-	"""
-	change = 0.0
-	''' value of the changing
-	:type: float'''
-	new_balance = 0.0
-	''' the new value of account
-	:type: float'''
-	reason = ''
-	''' reason of the modification
-	:type: string'''
-	time_stamp = None
-	''' time point of modification
-	:type: datetime.datetime'''
-	modification_type = None
-	''' class of modification. This field sorts the transaction into a larger group of modifications. For example this money was spend for food, clothes etc.
-	:type: TransactionTypes enum'''
-	note = ''
-	''' some important information about the modification
-	:type: string'''
-
-
-## CLASSES
-
 class Account:
-	"""
-	Primitive class of all accounts and its main managing methods
-	"""
-	name = None
-	''' name of the account; :type: string'''
-	__note = None
-	''' some important information about the account; :type: string'''
-	modification_list = None
-	''' store of all modification that is associated to this account; :type: list of Modification objects'''
-	balance = None
-	''' balance of this account inf HUF; :type: float'''
-	
-	def __init__(self, acc_name, init_value):
+	def __init__(self, acc_name='no name', init_value=0, verbose=True):
+		self.name = acc_name
+		self.verbose = False
+		
+		
+		self.msg_start("initialize account")
+		
 		# create the first modification
-		first_mod = Modification()
-		first_mod.change = float(init_value)
-		first_mod.reason = 'init'
-		first_mod.time_stamp = datetime.now()
-		first_mod.modification_type = TransactionTypes.init
-		first_mod.note = acc_name + " account"
+		first_transaction = Transaction()
+		first_transaction.change = float(init_value)
+		first_transaction.reason = 'init'
+		first_transaction.time_stamp = datetime.now()
+		first_transaction.modification_type = TransactionTypes.init
+		first_transaction.note = acc_name + " account"
 		
 		# init the account
-		self.name = acc_name
+		
 		self.note = acc_name + " account"
+		''' some important information about the account; :type: string'''
+		
 		self.modification_list = []
+		''' store of all modification that is associated to this account; :type: list of Modification objects'''
+		
 		self.balance = 0.0
-		self.doModification(first_mod)
-		return
+		''' balance of this account inf HUF; :type: float'''
+		
+		
+		
+		# proceed our first transaction
+		self.new_transaction(first_transaction)
+		
+		self.msg_success()
+		self.verbose = verbose
+		print("\taccount name: %s" % self.name)
+		print("\tnote: %s" % self.note)
+		print("\tbalance: {:,.0f}".format(self.balance).replace(',',' '))
 	
-	def doModification(self, mod):
-		# check the field types
-		assert (type(mod.change) == float) or (type(
-			mod.change) == int), "[%s account] The content of modification's name field is not float or int" % self.name
-		assert type(
-			mod.reason) == str, "[%s account] The content of reason field in the modification is not string" % self.name
-		assert type(
-			mod.time_stamp) == datetime, "[%s account] The value in the time_stamp field of the modification is not a datetime format" % self.name
-		assert type(
-			mod.modification_type) == TransactionTypes, "[%s account] The value in the modification_type field of the modification is not in valid format" % self.name
-		assert type(mod.note) == str, "[%s account] The value in the note field is not a string" % self.name
+	def new_transaction(self, transaction):
+		if self.verbose: self.msg_start("add new transaction")
 		# update balance
-		self.balance += mod.change
-		mod.new_balance = self.balance
+		self.balance += transaction.change
+		transaction.new_balance = self.balance
+		transaction.account_name = self.name
+		
 		# append the modification
-		self.modification_list.append(mod)
-		return
+		self.modification_list.append(transaction)
+		
+		if self.verbose:
+			self.msg_success()
+			self.msg_common("reason: {:s} | change: {:,d} | type: {:s} | new balance: {:,.0f}".format(transaction.reason,
+			                                                                                        transaction.change,
+			                                                                                        str(transaction.transaction_type),
+			                                                                                        self.balance).replace(',',' '))
+		
 	
-	def createModification(self, _value, _reason, _time_stamp, _transaction_type, _note):
+	def add_transaction(self, value, reason, time_stamp, transaction_type, note):
 		# create a mod object
-		mod = Modification()
-		mod.change = _value
-		mod.reason = _reason
-		mod.time_stamp = _time_stamp
-		mod.modification_type = _transaction_type
-		mod.note = _note
+		mod = Transaction()
+		mod.change = value
+		mod.reason = reason
+		mod.time_stamp = time_stamp
+		mod.modification_type = transaction_type
+		mod.note = note
 		
 		# execute the modification
-		self.doModification(mod)
+		self.new_transaction(mod)
 		return
+		
+	def msg_common(self, msg):
+		print("[%s account] %s" % (self.name, msg))
+		
+	def msg_start(self, msg):
+		print("[%s account] %s ... " %(self.name, msg), end="")
+	
+	@staticmethod
+	def msg_success():
+		print(msg_color_ok + '  [ok]' + msg_color_end)
+	
+	@staticmethod
+	def msg_fail(msg):
+		print(msg_color_warning + " [fail]\n\t" + msg)
+	
+	
+	
+		
+	
+
+
+if __name__ == '__main__':
+	acc0 = Account()
+	acc1 = Account('muhaha', 100000)
+	acc1.add_transaction(value=-10000,
+	                     reason='no reason',
+	                     time_stamp=datetime.now(),
+	                     transaction_type=TransactionTypes.clothes,
+	                     note='')
+	tr0 = Transaction()
+	tr0.transaction_type = TransactionTypes.entertainment
+	tr0.time_stamp = datetime.now()
+	tr0.change = 150000
+	tr0.reason = 'test'
+
