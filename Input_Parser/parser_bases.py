@@ -42,11 +42,12 @@ class ParseTransaction:
 	"""
 	Class for parsing transactions from CSV lines
 	"""
+	
 	def __init__(self):
 		self.card_number = 0  # the number of mentioned card
 		self.sign = 0  # -1 or +1, which represents that this transaction is a deposit or a withdrawal
 		self.change_value = 0  # the value of changing
-		self.currency = ''   # represents the currency of the change (for example HUF)
+		self.currency = ''  # represents the currency of the change (for example HUF)
 		self.date_of_transaction = datetime(1, 1, 1)  # the date when the transaction has been done
 		self.date_of_realization = datetime(1, 1, 1)  # when appeared the transaction on the account
 		self.balance = 0  # the new balance after the transaction
