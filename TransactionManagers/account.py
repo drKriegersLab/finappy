@@ -17,36 +17,24 @@ class AccountTypes(Enum):
 
 
 class Account:
-	def __init__(self, acc_name='no name', init_value=0, verbose=True):
+	def __init__(self, acc_name='no name', init_value=0, verbose=False):
 		self.name = acc_name
 		self.verbose = False
 		
 		
 		self.msg_start("initialize account")
 		
-		# create the first modification
-		first_transaction = Transaction()
-		first_transaction.change = float(init_value)
-		first_transaction.reason = 'init'
-		first_transaction.time_stamp = datetime.now()
-		first_transaction.modification_type = TransactionTypes.init
-		first_transaction.note = acc_name + " account"
-		
 		# init the account
 		
 		self.note = acc_name + " account"
 		''' some important information about the account; :type: string'''
 		
-		self.modification_list = []
+		self.transaction_list = []
 		''' store of all modification that is associated to this account; :type: list of Modification objects'''
 		
 		self.balance = 0.0
 		''' balance of this account inf HUF; :type: float'''
 		
-		
-		
-		# proceed our first transaction
-		self.new_transaction(first_transaction)
 		
 		self.msg_success()
 		self.verbose = verbose
@@ -57,12 +45,12 @@ class Account:
 	def new_transaction(self, transaction):
 		if self.verbose: self.msg_start("add new transaction")
 		# update balance
-		self.balance += transaction.change
-		transaction.new_balance = self.balance
+		# self.balance += transaction.change
+		# transaction.new_balance = self.balance
 		transaction.account_name = self.name
 		
 		# append the modification
-		self.modification_list.append(transaction)
+		self.transaction_list.append(transaction)
 		
 		if self.verbose:
 			self.msg_success()

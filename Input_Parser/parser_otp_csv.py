@@ -38,6 +38,8 @@ class ParseOtpTransaction(ParseTransaction):
 	
 	def __init__(self, csv_line_pieces):
 		ParseTransaction.__init__(self)
+		self.csv_line_pieces = csv_line_pieces
+		
 		self.parse_card_number(csv_line_pieces[Fields_enum.card_number.value])
 		self.parse_sign(csv_line_pieces[Fields_enum.sign.value])
 		self.parse_change_value(csv_line_pieces[Fields_enum.change.value])
